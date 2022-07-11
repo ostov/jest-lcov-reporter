@@ -6,8 +6,8 @@ export function tabulate(lcov, options) {
 	const head = tr(
 		th("File"),
 		// th("Branches"),
-		th("Funcs (%)"),
 		th("Lines (%)"),
+		th("Funcs (%)"),
 		th("Uncovered Lines"),
 	)
 
@@ -67,7 +67,7 @@ function toRow(file, indent, options) {
 	let functions = percentage(file.functions, options);
 	let lines = percentage(file.lines, options);
 
-	const allOk = branches.includes('100') && functions.includes('100') && lines.includes('100');
+	const allOk = branches === '' && functions === '' && lines === '';
 
 	if (allOk) {
 		return null;
@@ -76,8 +76,8 @@ function toRow(file, indent, options) {
 	return tr(
 		td(filename(file, indent, options)),
 		// td(branches),
-		td(functions),
 		td(lines),
+		td(functions),
 		td(uncovered(file, options)),
 	)
 }
@@ -100,7 +100,7 @@ function percentage(item) {
 
 	const tag = value === 100 ? fragment : b
 
-	if (rounded === '0') {
+	if (rounded === '0' || rounded === '100') {
 		return "";
 	}
 
