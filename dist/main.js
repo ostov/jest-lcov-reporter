@@ -86669,7 +86669,7 @@ async function main() {
 	const githubClient = new github.GitHub(token);
 
 	const createGitHubComment = () =>
-		githubClient.issues.createComment({
+		githubClient.rest.issues.createComment({
 			repo: context.repo.repo,
 			owner: context.repo.owner,
 			issue_number: context.payload.pull_request.number,
@@ -86677,7 +86677,7 @@ async function main() {
 		});
 
 	const updateGitHubComment = commentId =>
-		githubClient.issues.updateComment({
+		githubClient.rest.issues.updateComment({
 			repo: context.repo.repo,
 			owner: context.repo.owner,
 			comment_id: commentId,
@@ -86685,7 +86685,7 @@ async function main() {
 		});
 
 	if (updateComment) {
-		const issueComments = await githubClient.issues.listComments({
+		const issueComments = await githubClient.rest.issues.listComments({
 			repo: context.repo.repo,
 			owner: context.repo.owner,
 			issue_number: context.payload.pull_request.number,
