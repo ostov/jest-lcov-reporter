@@ -86523,7 +86523,7 @@ const fragment = function(...children) {
 function tabulate(lcov, options) {
 	const head = tr(
 		th("File"),
-		th("Branches"),
+		// th("Branches"),
 		th("Funcs"),
 		th("Lines"),
 		th("Uncovered Lines"),
@@ -86545,11 +86545,15 @@ function tabulate(lcov, options) {
 	const rows = Object.keys(folders)
 		.sort()
 		.reduce(
-			(acc, key) => [
-				...acc,
-				toFolder(key),
-				...folders[key].map(file => toRow(file, key !== "", options)).filter(e => e !== null),
-			],
+			(acc, key) => {
+				const files = [...folders[key]].sort((a,b)=>a.file.localCompare(b.file)).map(file => toRow(file, key !== "", options)).filter(e => e !== null);
+				return files.length ? [
+					...acc,
+					toFolder(key),
+					files
+					,
+				] : acc;
+			},
 			[],
 		);
 
@@ -86561,7 +86565,7 @@ function toFolder(path) {
 		return ""
 	}
 
-	return tr(td({ colspan: 5 }, b(path)))
+	return tr(td({ colspan: 4 }, b(path)))
 }
 
 function toRow(file, indent, options) {
@@ -86577,7 +86581,7 @@ function toRow(file, indent, options) {
 
 	return tr(
 		td(filename(file, indent, options)),
-		td(branches),
+		// td(branches),
 		td(functions),
 		td(lines),
 		td(uncovered(file, options)),
