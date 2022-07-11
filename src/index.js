@@ -1,7 +1,8 @@
 import { promises as fs } from "fs"
 import core from "@actions/core"
-import { GitHub, context } from "@actions/github"
 import sh from 'run-sh';
+import { getOctokit, context } from "@actions/github"
+
 import { parse } from "./lcov"
 import { commentIdentifier, diff } from "./comment"
 
@@ -57,7 +58,7 @@ async function main() {
 	const lcov = await parse(raw)
 	const baselcov = baseRaw && (await parse(baseRaw))
 	const body = await diff(lcov, baselcov, options)
-	const githubClient = new GitHub(token)
+	const githubClient = new getOctokit(token)
 
 	const createGitHubComment = () =>
 		githubClient.rest.issues.createComment({

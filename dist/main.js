@@ -10,11 +10,11 @@ var require$$1$1 = require('tls');
 var require$$4 = require('events');
 require('assert');
 var require$$6 = require('util');
-var require$$0$4 = require('stream');
+var require$$0$3 = require('child_process');
+var require$$0$5 = require('stream');
 var require$$2$1 = require('url');
-var require$$0$3 = require('punycode');
+var require$$0$4 = require('punycode');
 var require$$5 = require('zlib');
-var require$$0$5 = require('child_process');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -26,11 +26,11 @@ var require$$3__default = /*#__PURE__*/_interopDefaultLegacy(require$$3);
 var require$$1__default = /*#__PURE__*/_interopDefaultLegacy(require$$1$1);
 var require$$4__default = /*#__PURE__*/_interopDefaultLegacy(require$$4);
 var require$$6__default = /*#__PURE__*/_interopDefaultLegacy(require$$6);
-var require$$0__default$4 = /*#__PURE__*/_interopDefaultLegacy(require$$0$4);
-var require$$2__default$1 = /*#__PURE__*/_interopDefaultLegacy(require$$2$1);
 var require$$0__default$3 = /*#__PURE__*/_interopDefaultLegacy(require$$0$3);
-var require$$5__default = /*#__PURE__*/_interopDefaultLegacy(require$$5);
 var require$$0__default$5 = /*#__PURE__*/_interopDefaultLegacy(require$$0$5);
+var require$$2__default$1 = /*#__PURE__*/_interopDefaultLegacy(require$$2$1);
+var require$$0__default$4 = /*#__PURE__*/_interopDefaultLegacy(require$$0$4);
+var require$$5__default = /*#__PURE__*/_interopDefaultLegacy(require$$5);
 
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -2021,6 +2021,24 @@ function requireCore () {
 }
 
 var coreExports = requireCore();
+
+const { exec } = require$$0__default$3["default"];
+
+var runSh = function(cmd) {
+  return new Promise(function (resolve, reject) {
+    exec(cmd, function execCallback(err, stdout, stderr) {
+      if (err) {
+        console.log(stderr);
+        reject(err);
+      } else {
+        // Strips newline at end
+        stdout = stdout.replace(/\n$/, '');
+        stderr = stderr.replace(/\n$/, '');
+        resolve({ stdout, stderr });
+      }
+    });
+  });
+};
 
 var github = {};
 
@@ -80644,7 +80662,7 @@ var require$$1 = [
 	]
 ];
 
-var punycode = require$$0__default$3["default"];
+var punycode = require$$0__default$4["default"];
 var mappingTable = require$$1;
 
 var PROCESSING_OPTIONS = {
@@ -80837,7 +80855,7 @@ tr46.toUnicode = function(domain_name, useSTD3) {
 tr46.PROCESSING_OPTIONS = PROCESSING_OPTIONS;
 
 (function (module) {
-	const punycode = require$$0__default$3["default"];
+	const punycode = require$$0__default$4["default"];
 	const tr46$1 = tr46;
 
 	const specialSchemes = {
@@ -82547,7 +82565,7 @@ publicApi.parseURL = urlStateMachine.exports.parseURL;
 
 	function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-	var Stream = _interopDefault(require$$0__default$4["default"]);
+	var Stream = _interopDefault(require$$0__default$5["default"]);
 	var http = _interopDefault(require$$2__default["default"]);
 	var Url = _interopDefault(require$$2__default$1["default"]);
 	var whatwgUrl = _interopDefault(publicApi);
@@ -86321,7 +86339,7 @@ var __importStar = (commonjsGlobal && commonjsGlobal.__importStar) || function (
     return result;
 };
 Object.defineProperty(github, "__esModule", { value: true });
-github.getOctokit = context = github.context = void 0;
+var getOctokit_1 = github.getOctokit = context = github.context = void 0;
 const Context = __importStar(context$1);
 const utils_1 = utils$2;
 var context = github.context = new Context.Context();
@@ -86334,25 +86352,7 @@ var context = github.context = new Context.Context();
 function getOctokit(token, options) {
     return new utils_1.GitHub(utils_1.getOctokitOptions(token, options));
 }
-github.getOctokit = getOctokit;
-
-const { exec } = require$$0__default$5["default"];
-
-var runSh = function(cmd) {
-  return new Promise(function (resolve, reject) {
-    exec(cmd, function execCallback(err, stdout, stderr) {
-      if (err) {
-        console.log(stderr);
-        reject(err);
-      } else {
-        // Strips newline at end
-        stdout = stdout.replace(/\n$/, '');
-        stderr = stderr.replace(/\n$/, '');
-        resolve({ stdout, stderr });
-      }
-    });
-  });
-};
+getOctokit_1 = github.getOctokit = getOctokit;
 
 var lib = {exports: {}};
 
@@ -86744,7 +86744,7 @@ async function main() {
 	const lcov = await parse(raw);
 	const baselcov = baseRaw && (await parse(baseRaw));
 	const body = await diff(lcov, baselcov, options);
-	const githubClient = new github.GitHub(token);
+	const githubClient = new getOctokit_1(token);
 
 	const createGitHubComment = () =>
 		githubClient.rest.issues.createComment({
