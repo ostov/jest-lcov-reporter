@@ -86621,7 +86621,7 @@ function percentage(item) {
 	const value = item.found === 0 ? 100 : (item.hit / item.found) * 100;
 	const rounded = value.toFixed(2).replace(/\.0*$/, "");
 
-	const tag = value === 100 ? fragment : b;
+	const tag = value > 70 ? fragment : b;
 
 
 	if (rounded === '100') {
