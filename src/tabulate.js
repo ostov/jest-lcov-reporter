@@ -100,6 +100,10 @@ function percentage(item) {
 
 	const tag = value === 100 ? fragment : b
 
+	if (rounded === '0') {
+		return "";
+	}
+
 	return tag(`${rounded}`)
 }
 
@@ -112,9 +116,9 @@ function uncovered(file, options) {
 		.filter(line => line.hit === 0)
 		.map(line => line.line)
 	const allLines = [...branches, ...lines]
-	let tempAll = ["..."]
+	let tempAll = ['..']
 	let all = [...branches, ...lines].sort()
-	if (all.length > 4) {
+	if (all.length > 3) {
 		const lastFour = all.slice(Math.max(all.length - 4, 0))
 
 		all = tempAll.concat(lastFour)
