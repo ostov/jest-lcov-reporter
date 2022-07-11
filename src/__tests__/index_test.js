@@ -1,6 +1,6 @@
 import core from "@actions/core"
 import { promises as fs } from "fs"
-import { context, GitHub } from "@actions/github"
+import { context, getOctokit } from "@actions/github"
 import { parse } from "../lcov"
 import { commentIdentifier, diff } from "../comment"
 
@@ -11,7 +11,7 @@ jest.mock("@actions/core", () => ({
 }))
 
 jest.mock("@actions/github", () => ({
-	GitHub: jest.fn(),
+	getOctokit: jest.fn(),
 	context: {
 		payload: {
 			repository: { full_name: "name" },
@@ -87,7 +87,7 @@ test("it catches and logs if an error occurs", async () => {
 
 	const error = new Error("Something went wrong...")
 	const createCommentMock = jest.fn().mockReturnValue(Promise.reject(error))
-	GitHub.mockReturnValue({
+	getOctokit.mockReturnValue({
 		rest: {
 			issues: {
 				createComment: createCommentMock,
@@ -118,7 +118,7 @@ test("when a non pull_request event is passed it logs a message", async () => {
 
 	const createCommentMock = jest.fn().mockReturnValue(Promise.resolve())
 	const updateCommentMock = jest.fn().mockReturnValue(Promise.resolve())
-	GitHub.mockReturnValue({
+	getOctokit.mockReturnValue({
 		rest: {
 			issues: {
 				createComment: createCommentMock,
@@ -145,7 +145,7 @@ test("a comment is created on the pull request with the coverage details", async
 		.mockReturnValueOnce(Promise.resolve(null))
 
 	const createCommentMock = jest.fn().mockReturnValue(Promise.resolve())
-	GitHub.mockReturnValue({
+	getOctokit.mockReturnValue({
 		rest: {
 			issues: {
 				createComment: createCommentMock,
@@ -177,7 +177,7 @@ describe("when update-comment is enabled", () => {
 			.mockReturnValueOnce(Promise.resolve(null))
 
 		const createCommentMock = jest.fn().mockReturnValue(Promise.resolve())
-		GitHub.mockReturnValue({
+		getOctokit.mockReturnValue({
 			rest: {
 				issues: {
 					createComment: createCommentMock,
@@ -211,7 +211,7 @@ describe("when update-comment is enabled", () => {
 		commentIdentifier.mockReturnValueOnce("COMMENT ID")
 
 		const updateCommentMock = jest.fn().mockReturnValue(Promise.resolve())
-		GitHub.mockReturnValue({
+		getOctokit.mockReturnValue({
 			rest: {
 				issues: {
 					updateComment: updateCommentMock,

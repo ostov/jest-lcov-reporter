@@ -143,68 +143,50 @@ test("tabulate should generate a correct table", function() {
 		tbody(
 			tr(
 				th("File"),
-				th("Branches"),
-				th("Funcs"),
-				th("Lines"),
+				th("Lines (%)"),
+				th("Funcs (%)"),
 				th("Uncovered Lines"),
 			),
 			tr(
 				td(
-					span(
 						"index.js",
-					),
 				),
 				td("N/A"),
-				td("100%"),
-				td("N/A"),
+				td(""),
 				td(),
 			),
-			tr(td({ colspan: 5 }, b("src"))),
+			tr(td({ colspan: 4 },`<b title="src">src</b>`)),
 			tr(
 				td(
 					"&nbsp; &nbsp;",
-					span(
-						"foo.js",
-					),
+					"foo.js"
 				),
-				td("100%"),
-				td(b("66.67%")),
-				td(b("91.30%")),
+				td("91.30"),
+				td(b("66.67")),
 				td(
-					span("37"),
+					"37"
 				),
 			),
-			tr(td({ colspan: 5 }, b("src/bar"))),
+			tr(td({ colspan: 4 },`<b title="src/bar">bar</b>`)),
 			tr(
 				td(
 					"&nbsp; &nbsp;",
-					span(
-						"baz.js",
-					),
+					"baz.js"
 				),
-				td("N/A"),
-				td(b("66.67%")),
-				td(b("50%")),
+				td(b("50")),
+				td(b("66.67")),
 				td(
-					span(
-						"..."
-					),
-					", ",
-					span(
+					
 						"31",
-					),
 					", ",
-					span(
+					
 						"32",
-					),
+					
 					", ",
-					span(
 						"33",
-					),
+					
 					", ",
-					span(
-						"34",
-					),
+						"34", ",", " ..."
 				),
 			),
 		),
