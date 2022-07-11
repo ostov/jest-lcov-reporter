@@ -86623,8 +86623,13 @@ function percentage(item) {
 
 	const tag = value === 100 ? fragment : b;
 
-	if (rounded === '0' || rounded === '100') {
+
+	if (rounded === '100') {
 		return "";
+	}
+
+	if (rounded === '0') {
+		return "0";
 	}
 
 	return tag(`${rounded}`)
