@@ -86512,7 +86512,6 @@ const th = tag("th");
 const b = tag("b");
 const table = tag("table");
 const tbody = tag("tbody");
-const span = tag("span");
 const p = tag("p");
 
 const fragment = function(...children) {
@@ -86524,8 +86523,8 @@ function tabulate(lcov, options) {
 	const head = tr(
 		th("File"),
 		// th("Branches"),
-		th("Funcs"),
-		th("Lines"),
+		th("Funcs (%)"),
+		th("Lines (%)"),
 		th("Uncovered Lines"),
 	);
 
@@ -86552,7 +86551,7 @@ function tabulate(lcov, options) {
 					toFolder(key),
 					files
 					,
-				] : acc;
+				] : [...acc];
 			},
 			[],
 		);
@@ -86560,12 +86559,26 @@ function tabulate(lcov, options) {
 	return table(tbody(head, ...rows))
 }
 
+function smartTrim(path) {
+	const parts = path.split("/");
+	const keywords = ['components'];
+
+	return parts.reduce((acc, part) => {
+		if (keywords.includes(part)) {
+			return [...acc, '...'];
+		}
+
+		return [...acc, part];
+	}).join('/');
+}
+
+
 function toFolder(path) {
 	if (path === "") {
 		return ""
 	}
 
-	return tr(td({ colspan: 4 }, b(path)))
+	return tr(td({ colspan: 4 }, `<b title="${path}">${smartTrim(path)}</b>`))
 }
 
 function toRow(file, indent, options) {
@@ -86573,7 +86586,7 @@ function toRow(file, indent, options) {
 	let functions = percentage(file.functions);
 	let lines = percentage(file.lines);
 
-	const allOk = branches.includes('100%') && functions.includes('100%') && lines.includes('100%');
+	const allOk = branches.includes('100') && functions.includes('100') && lines.includes('100');
 
 	if (allOk) {
 		return null;
@@ -86593,7 +86606,7 @@ function filename(file, indent, options) {
 	const parts = relative.split("/");
 	const last = parts[parts.length - 1];
 	const space = indent ? "&nbsp; &nbsp;" : "";
-	return fragment(space, span(last))
+	return fragment(space, last)
 }
 
 function percentage(item) {
@@ -86606,7 +86619,7 @@ function percentage(item) {
 
 	const tag = value === 100 ? fragment : b;
 
-	return tag(`${rounded}%`)
+	return tag(`${rounded}`)
 }
 
 function uncovered(file, options) {
@@ -86629,7 +86642,7 @@ function uncovered(file, options) {
 		.map(function(line) {
 			file.file.replace(options.prefix, "");
 			const path = `${line}`;
-			return span(path)
+			return path;
 		})
 		.join(", ")
 }
