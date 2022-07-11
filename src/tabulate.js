@@ -1,3 +1,4 @@
+// @ts-check
 import { th, tr, td, table, tbody, a, b, span, fragment } from "./html"
 
 // Tabulate the lcov data in a HTML table.
@@ -41,17 +42,15 @@ export function tabulate(lcov, options) {
 	return table(tbody(head, ...rows))
 }
 
-function smartTrim(path) {
+function smartTrim(rawPath) {
+	const path = rawPath.replace('src/', '');
 	const parts = path.split("/");
 	const keywords = ['components'];
+	const newParts = parts.map((p)=>{
+		return keywords.includes(p) ? '...' : p.split('.').pop();
+	});
 
-	return parts.reduce((acc, part) => {
-		if (keywords.includes(part)) {
-			return [...acc, '...'];
-		}
-
-		return [...acc, part];
-	}).join('/');
+	return newParts.join("/");
 }
 
 
