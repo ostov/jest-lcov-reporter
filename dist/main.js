@@ -14,6 +14,7 @@ var require$$0$4 = require('stream');
 var require$$2$1 = require('url');
 var require$$0$3 = require('punycode');
 var require$$5 = require('zlib');
+var require$$0$5 = require('child_process');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -29,6 +30,7 @@ var require$$0__default$4 = /*#__PURE__*/_interopDefaultLegacy(require$$0$4);
 var require$$2__default$1 = /*#__PURE__*/_interopDefaultLegacy(require$$2$1);
 var require$$0__default$3 = /*#__PURE__*/_interopDefaultLegacy(require$$0$3);
 var require$$5__default = /*#__PURE__*/_interopDefaultLegacy(require$$5);
+var require$$0__default$5 = /*#__PURE__*/_interopDefaultLegacy(require$$0$5);
 
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -2302,9 +2304,9 @@ var distNode$7 = {};
 
 var distNode$6 = {};
 
-var isPlainObject$3 = {};
+var isPlainObject$5 = {};
 
-Object.defineProperty(isPlainObject$3, '__esModule', { value: true });
+Object.defineProperty(isPlainObject$5, '__esModule', { value: true });
 
 /*!
  * is-plain-object <https://github.com/jonschlinkert/is-plain-object>
@@ -2313,14 +2315,14 @@ Object.defineProperty(isPlainObject$3, '__esModule', { value: true });
  * Released under the MIT License.
  */
 
-function isObject(o) {
+function isObject$1(o) {
   return Object.prototype.toString.call(o) === '[object Object]';
 }
 
-function isPlainObject$2(o) {
+function isPlainObject$4(o) {
   var ctor,prot;
 
-  if (isObject(o) === false) return false;
+  if (isObject$1(o) === false) return false;
 
   // If has modified constructor
   ctor = o.constructor;
@@ -2328,7 +2330,7 @@ function isPlainObject$2(o) {
 
   // If has modified prototype
   prot = ctor.prototype;
-  if (isObject(prot) === false) return false;
+  if (isObject$1(prot) === false) return false;
 
   // If constructor does not have an Object-specific method
   if (prot.hasOwnProperty('isPrototypeOf') === false) {
@@ -2339,11 +2341,11 @@ function isPlainObject$2(o) {
   return true;
 }
 
-isPlainObject$3.isPlainObject = isPlainObject$2;
+isPlainObject$5.isPlainObject = isPlainObject$4;
 
 Object.defineProperty(distNode$6, '__esModule', { value: true });
 
-var isPlainObject$1 = isPlainObject$3;
+var isPlainObject$3 = isPlainObject$5;
 var universalUserAgent$3 = distNode$8;
 
 function lowercaseKeys(object) {
@@ -2360,7 +2362,7 @@ function lowercaseKeys(object) {
 function mergeDeep(defaults, options) {
   const result = Object.assign({}, defaults);
   Object.keys(options).forEach(key => {
-    if (isPlainObject$1.isPlainObject(options[key])) {
+    if (isPlainObject$3.isPlainObject(options[key])) {
       if (!(key in defaults)) Object.assign(result, {
         [key]: options[key]
       });else result[key] = mergeDeep(defaults[key], options[key]);
@@ -2728,6 +2730,45 @@ const DEFAULTS = {
 const endpoint$1 = withDefaults$2(null, DEFAULTS);
 
 distNode$6.endpoint = endpoint$1;
+
+var isPlainObject$2 = {};
+
+Object.defineProperty(isPlainObject$2, '__esModule', { value: true });
+
+/*!
+ * is-plain-object <https://github.com/jonschlinkert/is-plain-object>
+ *
+ * Copyright (c) 2014-2017, Jon Schlinkert.
+ * Released under the MIT License.
+ */
+
+function isObject(o) {
+  return Object.prototype.toString.call(o) === '[object Object]';
+}
+
+function isPlainObject$1(o) {
+  var ctor,prot;
+
+  if (isObject(o) === false) return false;
+
+  // If has modified constructor
+  ctor = o.constructor;
+  if (ctor === undefined) return true;
+
+  // If has modified prototype
+  prot = ctor.prototype;
+  if (isObject(prot) === false) return false;
+
+  // If constructor does not have an Object-specific method
+  if (prot.hasOwnProperty('isPrototypeOf') === false) {
+    return false;
+  }
+
+  // Most likely a plain Object
+  return true;
+}
+
+isPlainObject$2.isPlainObject = isPlainObject$1;
 
 var lib$2 = {exports: {}};
 
@@ -84379,7 +84420,7 @@ function _interopDefault$1 (ex) { return (ex && (typeof ex === 'object') && 'def
 
 var endpoint = distNode$6;
 var universalUserAgent$2 = distNode$8;
-var isPlainObject = isPlainObject$3;
+var isPlainObject = isPlainObject$2;
 var nodeFetch = _interopDefault$1(lib$2.exports);
 var requestError = distNode$5;
 
@@ -86295,6 +86336,24 @@ function getOctokit(token, options) {
 }
 github.getOctokit = getOctokit;
 
+const { exec } = require$$0__default$5["default"];
+
+var runSh = function(cmd) {
+  return new Promise(function (resolve, reject) {
+    exec(cmd, function execCallback(err, stdout, stderr) {
+      if (err) {
+        console.log(stderr);
+        reject(err);
+      } else {
+        // Strips newline at end
+        stdout = stdout.replace(/\n$/, '');
+        stderr = stderr.replace(/\n$/, '');
+        resolve({ stdout, stderr });
+      }
+    });
+  });
+};
+
 var lib = {exports: {}};
 
 /*
@@ -86492,6 +86551,11 @@ function tabulate(lcov, options) {
 
 	const folders = {};
 	for (const file of lcov) {
+		if (!options.files.some(f => {
+			return file.file.endsWith(f) || f.endsWith(file.file);
+		})) {
+			return;
+		}
 		const parts = file.file.replace(options.prefix, "").split("/");
 		const folder = parts.slice(0, -1).join("/");
 		folders[folder] = folders[folder] || [];
@@ -86653,13 +86717,27 @@ async function main() {
 		return
 	}
 
+	const head = context.payload.pull_request.head.ref;
+	const base = context.payload.pull_request.base.ref;
+
+	
+	let changed = [];
+
+	try {
+		const res = await runSh(`git diff --name-only ${head} ${base}`);
+		changed = res.stdout.split("\n");
+	} catch(e) {
+		// ignore
+	}
+
 	const options = {
 		name,
+		files: changed,
 		repository: context.payload.repository.full_name,
 		commit: context.payload.pull_request.head.sha,
 		prefix: `${process.env.GITHUB_WORKSPACE}/`,
-		head: context.payload.pull_request.head.ref,
-		base: context.payload.pull_request.base.ref,
+		head,
+		base,
 		workflowName: process.env.GITHUB_WORKFLOW,
 	};
 

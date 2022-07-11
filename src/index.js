@@ -1,7 +1,7 @@
 import { promises as fs } from "fs"
 import core from "@actions/core"
 import { GitHub, context } from "@actions/github"
-
+import sh from 'run-sh';
 import { parse } from "./lcov"
 import { commentIdentifier, diff } from "./comment"
 
@@ -30,13 +30,27 @@ async function main() {
 		return
 	}
 
+	const head = context.payload.pull_request.head.ref;
+	const base = context.payload.pull_request.base.ref;
+
+	
+	let changed = [];
+
+	try {
+		const res = await sh(`git diff --name-only ${head} ${base}`);
+		changed = res.stdout.split("\n");
+	} catch(e) {
+		// ignore
+	}
+
 	const options = {
 		name,
+		files: changed,
 		repository: context.payload.repository.full_name,
 		commit: context.payload.pull_request.head.sha,
 		prefix: `${process.env.GITHUB_WORKSPACE}/`,
-		head: context.payload.pull_request.head.ref,
-		base: context.payload.pull_request.base.ref,
+		head,
+		base,
 		workflowName: process.env.GITHUB_WORKFLOW,
 	}
 

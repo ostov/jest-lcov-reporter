@@ -2,6 +2,11 @@ import { tabulate } from "../tabulate"
 import { th, tr, td, table, tbody, b, span, fragment } from "../html"
 
 test("tabulate should generate a correct table", function() {
+	const files = [
+		'/files/project/index.js',
+		'/files/project/src/foo.js',
+		'/files/project/src/bar/baz.js'
+	]
 	const data = [
 		{
 			file: "/files/project/index.js",
@@ -131,6 +136,7 @@ test("tabulate should generate a correct table", function() {
 		repository: "example/foo",
 		commit: "2e15bee6fe0df5003389aa5ec894ec0fea2d874a",
 		prefix: "/files/project/",
+		files
 	}
 
 	const html = table(
