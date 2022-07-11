@@ -6,6 +6,7 @@ import { commentIdentifier, diff } from "../comment"
 
 jest.mock("@actions/core", () => ({
 	getInput: jest.fn(),
+	getBooleanInput: jest.fn(),
 	setFailed: jest.fn(),
 }))
 
@@ -39,8 +40,12 @@ beforeEach(() => {
 		if (arg === "name") return "NAME"
 		if (arg === "lcov-file") return "LCOV_FILE"
 		if (arg === "lcov-base") return "LCOV_BASE"
-		if (arg === "update-comment") return updateComment
 		return ""
+	})
+
+	core.getBooleanInput.mockImplementation(arg => {
+		if (arg === "update-comment") return updateComment
+		return false
 	})
 
 	context.payload.pull_request = {
@@ -83,9 +88,12 @@ test("it catches and logs if an error occurs", async () => {
 	const error = new Error("Something went wrong...")
 	const createCommentMock = jest.fn().mockReturnValue(Promise.reject(error))
 	GitHub.mockReturnValue({
-		issues: {
-			createComment: createCommentMock,
-		},
+		rest: {
+			issues: {
+				createComment: createCommentMock,
+			},
+		}
+		
 	})
 
 	let module
@@ -111,10 +119,12 @@ test("when a non pull_request event is passed it logs a message", async () => {
 	const createCommentMock = jest.fn().mockReturnValue(Promise.resolve())
 	const updateCommentMock = jest.fn().mockReturnValue(Promise.resolve())
 	GitHub.mockReturnValue({
-		issues: {
-			createComment: createCommentMock,
-			updateComment: updateCommentMock,
-		},
+		rest: {
+			issues: {
+				createComment: createCommentMock,
+				updateComment: updateCommentMock,
+			}
+		}
 	})
 
 	let module
@@ -136,9 +146,11 @@ test("a comment is created on the pull request with the coverage details", async
 
 	const createCommentMock = jest.fn().mockReturnValue(Promise.resolve())
 	GitHub.mockReturnValue({
-		issues: {
-			createComment: createCommentMock,
-		},
+		rest: {
+			issues: {
+				createComment: createCommentMock,
+			},
+		}
 	})
 
 	let module
@@ -166,10 +178,12 @@ describe("when update-comment is enabled", () => {
 
 		const createCommentMock = jest.fn().mockReturnValue(Promise.resolve())
 		GitHub.mockReturnValue({
-			issues: {
-				createComment: createCommentMock,
-				listComments: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),
-			},
+			rest: {
+				issues: {
+					createComment: createCommentMock,
+					listComments: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),
+				},
+			}
 		})
 
 		let module
@@ -198,14 +212,16 @@ describe("when update-comment is enabled", () => {
 
 		const updateCommentMock = jest.fn().mockReturnValue(Promise.resolve())
 		GitHub.mockReturnValue({
-			issues: {
-				updateComment: updateCommentMock,
-				listComments: jest.fn().mockReturnValue(
-					Promise.resolve({
-						data: [{ id: 1, body: "Some content <!-- COMMENT ID -->" }],
-					}),
-				),
-			},
+			rest: {
+				issues: {
+					updateComment: updateCommentMock,
+					listComments: jest.fn().mockReturnValue(
+						Promise.resolve({
+							data: [{ id: 1, body: "Some content <!-- COMMENT ID -->" }],
+						}),
+					),
+				},
+			}
 		})
 
 		let module
