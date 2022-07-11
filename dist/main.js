@@ -86633,7 +86633,7 @@ async function main() {
 	const name = coreExports.getInput("name");
 	const lcovFile = coreExports.getInput("lcov-file") || "./coverage/lcov.info";
 	const baseFile = coreExports.getInput("lcov-base");
-	const updateComment = coreExports.getInput("update-comment");
+	const updateComment = coreExports.getBooleanInput("update-comment");
 
 	const raw = await require$$0$1.promises.readFile(lcovFile, "utf-8").catch(err => null);
 	if (!raw) {
