@@ -27,7 +27,7 @@ export function tabulate(lcov, options) {
 		.sort()
 		.reduce(
 			(acc, key) => {
-				const files = [...folders[key]].sort((a,b)=>a.file.localCompare(b.file)).map(file => toRow(file, key !== "", options)).filter(e => e !== null);
+				const files = [...folders[key]].sort((a,b)=>a.file.localeCompare(b.file)).map(file => toRow(file, key !== "", options)).filter(e => e !== null);
 				return files.length ? [
 					...acc,
 					toFolder(key, options),
