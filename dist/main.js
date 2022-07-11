@@ -10,10 +10,9 @@ var require$$1$1 = require('tls');
 var require$$4 = require('events');
 require('assert');
 var require$$6 = require('util');
-var require$$0$3 = require('child_process');
-var require$$0$5 = require('stream');
+var require$$0$4 = require('stream');
 var require$$2$1 = require('url');
-var require$$0$4 = require('punycode');
+var require$$0$3 = require('punycode');
 var require$$5 = require('zlib');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
@@ -26,10 +25,9 @@ var require$$3__default = /*#__PURE__*/_interopDefaultLegacy(require$$3);
 var require$$1__default = /*#__PURE__*/_interopDefaultLegacy(require$$1$1);
 var require$$4__default = /*#__PURE__*/_interopDefaultLegacy(require$$4);
 var require$$6__default = /*#__PURE__*/_interopDefaultLegacy(require$$6);
-var require$$0__default$3 = /*#__PURE__*/_interopDefaultLegacy(require$$0$3);
-var require$$0__default$5 = /*#__PURE__*/_interopDefaultLegacy(require$$0$5);
-var require$$2__default$1 = /*#__PURE__*/_interopDefaultLegacy(require$$2$1);
 var require$$0__default$4 = /*#__PURE__*/_interopDefaultLegacy(require$$0$4);
+var require$$2__default$1 = /*#__PURE__*/_interopDefaultLegacy(require$$2$1);
+var require$$0__default$3 = /*#__PURE__*/_interopDefaultLegacy(require$$0$3);
 var require$$5__default = /*#__PURE__*/_interopDefaultLegacy(require$$5);
 
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -2021,24 +2019,6 @@ function requireCore () {
 }
 
 var coreExports = requireCore();
-
-const { exec } = require$$0__default$3["default"];
-
-var runSh = function(cmd) {
-  return new Promise(function (resolve, reject) {
-    exec(cmd, function execCallback(err, stdout, stderr) {
-      if (err) {
-        console.log(stderr);
-        reject(err);
-      } else {
-        // Strips newline at end
-        stdout = stdout.replace(/\n$/, '');
-        stderr = stderr.replace(/\n$/, '');
-        resolve({ stdout, stderr });
-      }
-    });
-  });
-};
 
 var github = {};
 
@@ -80662,7 +80642,7 @@ var require$$1 = [
 	]
 ];
 
-var punycode = require$$0__default$4["default"];
+var punycode = require$$0__default$3["default"];
 var mappingTable = require$$1;
 
 var PROCESSING_OPTIONS = {
@@ -80855,7 +80835,7 @@ tr46.toUnicode = function(domain_name, useSTD3) {
 tr46.PROCESSING_OPTIONS = PROCESSING_OPTIONS;
 
 (function (module) {
-	const punycode = require$$0__default$4["default"];
+	const punycode = require$$0__default$3["default"];
 	const tr46$1 = tr46;
 
 	const specialSchemes = {
@@ -82565,7 +82545,7 @@ publicApi.parseURL = urlStateMachine.exports.parseURL;
 
 	function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-	var Stream = _interopDefault(require$$0__default$5["default"]);
+	var Stream = _interopDefault(require$$0__default$4["default"]);
 	var http = _interopDefault(require$$2__default["default"]);
 	var Url = _interopDefault(require$$2__default$1["default"]);
 	var whatwgUrl = _interopDefault(publicApi);
@@ -86551,11 +86531,11 @@ function tabulate(lcov, options) {
 
 	const folders = {};
 	for (const file of lcov) {
-		if (!options.files.some(f => {
-			return file.file.endsWith(f) || f.endsWith(file.file);
-		})) {
-			return;
-		}
+		// if (!options.files.some(f => {
+		// 	return file.file.endsWith(f) || f.endsWith(file.file);
+		// })) {
+		// 	return;
+		// }
 		const parts = file.file.replace(options.prefix, "").split("/");
 		const folder = parts.slice(0, -1).join("/");
 		folders[folder] = folders[folder] || [];
@@ -86568,7 +86548,7 @@ function tabulate(lcov, options) {
 			(acc, key) => [
 				...acc,
 				toFolder(key),
-				...folders[key].map(file => toRow(file, key !== "", options)),
+				...folders[key].map(file => toRow(file, key !== "", options)).filter(e => e !== null),
 			],
 			[],
 		);
@@ -86585,11 +86565,21 @@ function toFolder(path) {
 }
 
 function toRow(file, indent, options) {
+	let branches = percentage(file.branches);
+	let functions = percentage(file.functions);
+	let lines = percentage(file.lines);
+
+	const allOk = branches.includes('100%') && functions.includes('100%') && lines.includes('100%');
+
+	if (allOk) {
+		return null;
+	}
+
 	return tr(
 		td(filename(file, indent, options)),
-		td(percentage(file.branches)),
-		td(percentage(file.functions)),
-		td(percentage(file.lines)),
+		td(branches),
+		td(functions),
+		td(lines),
 		td(uncovered(file, options)),
 	)
 }
@@ -86723,12 +86713,15 @@ async function main() {
 	
 	let changed = [];
 
-	try {
-		const res = await runSh(`git diff --name-only ${head} ${base}`);
-		changed = res.stdout.split("\n");
-	} catch(e) {
-		// ignore
-	}
+	// try {
+	// 	const q = `git diff --name-only ${head} ${base}`;
+	// 	const res = await sh(q);
+	// 	changed = res.stdout.split("\n");
+	// } catch(e) {
+	// 	console.info(`Unable to get diff: ${e}`);
+	// 	console.error(e);
+	// 	// ignore
+	// }
 
 	const options = {
 		name,

@@ -12,11 +12,11 @@ export function tabulate(lcov, options) {
 
 	const folders = {}
 	for (const file of lcov) {
-		if (!options.files.some(f => {
-			return file.file.endsWith(f) || f.endsWith(file.file);
-		})) {
-			return;
-		}
+		// if (!options.files.some(f => {
+		// 	return file.file.endsWith(f) || f.endsWith(file.file);
+		// })) {
+		// 	return;
+		// }
 		const parts = file.file.replace(options.prefix, "").split("/")
 		const folder = parts.slice(0, -1).join("/")
 		folders[folder] = folders[folder] || []
@@ -29,7 +29,7 @@ export function tabulate(lcov, options) {
 			(acc, key) => [
 				...acc,
 				toFolder(key, options),
-				...folders[key].map(file => toRow(file, key !== "", options)),
+				...folders[key].map(file => toRow(file, key !== "", options)).filter(e => e !== null),
 			],
 			[],
 		)
@@ -46,11 +46,21 @@ function toFolder(path) {
 }
 
 function toRow(file, indent, options) {
+	let branches = percentage(file.branches, options);
+	let functions = percentage(file.functions, options);
+	let lines = percentage(file.lines, options);
+
+	const allOk = branches.includes('100%') && functions.includes('100%') && lines.includes('100%');
+
+	if (allOk) {
+		return null;
+	}
+
 	return tr(
 		td(filename(file, indent, options)),
-		td(percentage(file.branches, options)),
-		td(percentage(file.functions, options)),
-		td(percentage(file.lines, options)),
+		td(branches),
+		td(functions),
+		td(lines),
 		td(uncovered(file, options)),
 	)
 }

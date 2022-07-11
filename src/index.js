@@ -1,6 +1,6 @@
 import { promises as fs } from "fs"
 import core from "@actions/core"
-import sh from 'run-sh';
+// import sh from 'run-sh';
 import { getOctokit, context } from "@actions/github"
 
 import { parse } from "./lcov"
@@ -37,12 +37,15 @@ async function main() {
 	
 	let changed = [];
 
-	try {
-		const res = await sh(`git diff --name-only ${head} ${base}`);
-		changed = res.stdout.split("\n");
-	} catch(e) {
-		// ignore
-	}
+	// try {
+	// 	const q = `git diff --name-only ${head} ${base}`;
+	// 	const res = await sh(q);
+	// 	changed = res.stdout.split("\n");
+	// } catch(e) {
+	// 	console.info(`Unable to get diff: ${e}`);
+	// 	console.error(e);
+	// 	// ignore
+	// }
 
 	const options = {
 		name,
