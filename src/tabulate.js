@@ -120,12 +120,11 @@ function uncovered(file, options) {
 		.filter(line => line.hit === 0)
 		.map(line => line.line)
 	const allLines = [...branches, ...lines]
-	let tempAll = ['..']
 	let all = [...branches, ...lines].sort()
 	if (all.length > 3) {
 		const lastFour = all.slice(Math.max(all.length - 4, 0))
 
-		all = tempAll.concat(lastFour)
+		all = [...lastFour, '...']
 	}
 	return all
 		.map(function(line) {
