@@ -12,6 +12,11 @@ export function tabulate(lcov, options) {
 
 	const folders = {}
 	for (const file of lcov) {
+		if (!options.files.some(f => {
+			return file.file.endsWith(f) || f.endsWith(file.file);
+		})) {
+			return;
+		}
 		const parts = file.file.replace(options.prefix, "").split("/")
 		const folder = parts.slice(0, -1).join("/")
 		folders[folder] = folders[folder] || []
