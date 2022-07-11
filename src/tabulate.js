@@ -49,8 +49,12 @@ function smartTrim(rawPath) {
 	const newParts = parts.map((p)=>{
 		return keywords.includes(p) ? '...' : p.split('.').pop();
 	});
-
-	return newParts.join("/");
+	const newLine = newParts.join('/');
+	if (newLine.length <= 96) {
+		return newLine;
+	} else {
+		return `${newLine.slice(0, 96)}...`;
+	}
 }
 
 
