@@ -12,14 +12,31 @@ export function tabulate(lcov, options) {
 	)
 
 	const folders = {}
+
+	function getFileParts(fileName) {
+		return fileName.replace(options.prefix, "").split("/");
+	}
+
+	function getFolderName(parts = []) {
+		return parts.slice(0, -1).join("/");
+	}
+	
+	options.files.forEach((fileName) => {
+		const parts = getFileParts(fileName);
+		const folder = getFolderName(parts);
+		folders[folder] = [];
+	});
+
 	for (const file of lcov) {
-		console.log(file.file, options.files[0]);
 		const shouldIncludeFile = options.files.length === 0 || options.files.includes(file.file)
-		if (!shouldIncludeFile) {
+		const parts = getFileParts(file.file);
+		const folder = getFolderName(parts);
+		const hasFolder = folder in folders;
+
+		if (!shouldIncludeFile && !hasFolder) {
 			continue
 		}
-		const parts = file.file.replace(options.prefix, "").split("/")
-		const folder = parts.slice(0, -1).join("/")
+		
 		folders[folder] = folders[folder] || []
 		folders[folder].push(file)
 	}

@@ -59,16 +59,6 @@ async function main() {
 		});
 	}
 
-	// try {
-	// 	const q = `git diff --name-only ${head} ${base}`;
-	// 	const res = await sh(q);
-	// 	changed = res.stdout.split("\n");
-	// } catch(e) {
-	// 	console.info(`Unable to get diff: ${e}`);
-	// 	console.error(e);
-	// 	// ignore
-	// }
-
 	const options = {
 		name,
 		files: changed,
