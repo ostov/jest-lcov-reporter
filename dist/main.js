@@ -86532,11 +86532,11 @@ function tabulate(lcov, options) {
 
 	const folders = {};
 	for (const file of lcov) {
-		// if (!options.files.some(f => {
-		// 	return file.file.endsWith(f) || f.endsWith(file.file);
-		// })) {
-		// 	return;
-		// }
+		console.log(file.file, options.files[0]);
+		const shouldIncludeFile = options.files.length === 0 || options.files.includes(file.file);
+		if (!shouldIncludeFile) {
+			continue
+		}
 		const parts = file.file.replace(options.prefix, "").split("/");
 		const folder = parts.slice(0, -1).join("/");
 		folders[folder] = folders[folder] || [];
@@ -86711,6 +86711,8 @@ function diff(lcov, before, options) {
 	)
 }
 
+// @ts-check
+
 async function main() {
 	const token = coreExports.getInput("github-token");
 	const name = coreExports.getInput("name");
@@ -86742,6 +86744,27 @@ async function main() {
 	
 	let changed = [];
 
+	const githubClient = getOctokit_1(token);
+
+
+    // Use GitHub's compare two commits API.
+    // https://developer.github.com/v3/repos/commits/#compare-two-commits
+
+    const response = await githubClient.rest.repos.compareCommits({
+		base,
+		head,
+		owner: context.repo.owner,
+		repo: context.repo.repo
+	});
+
+	if (response.data.files.length > 0) {
+		response.data.files.forEach((file) => {
+			if (file.status === 'added' || file.status === 'modified') {
+				changed.push(file.filename);
+			}
+		});
+	}
+
 	// try {
 	// 	const q = `git diff --name-only ${head} ${base}`;
 	// 	const res = await sh(q);
@@ -86766,7 +86789,6 @@ async function main() {
 	const lcov = await parse(raw);
 	const baselcov = baseRaw && (await parse(baseRaw));
 	const body = await diff(lcov, baselcov, options);
-	const githubClient = new getOctokit_1(token);
 
 	const createGitHubComment = () =>
 		githubClient.rest.issues.createComment({
