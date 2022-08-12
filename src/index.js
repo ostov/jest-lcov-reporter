@@ -1,3 +1,4 @@
+// @ts-check
 import { promises as fs } from "fs"
 import core from "@actions/core"
 // import sh from 'run-sh';
@@ -37,6 +38,27 @@ async function main() {
 	
 	let changed = [];
 
+	const githubClient = getOctokit(token);
+
+
+    // Use GitHub's compare two commits API.
+    // https://developer.github.com/v3/repos/commits/#compare-two-commits
+
+    const response = await githubClient.rest.repos.compareCommits({
+		base,
+		head,
+		owner: context.repo.owner,
+		repo: context.repo.repo
+	});
+
+	if (response.data.files.length > 0) {
+		response.data.files.forEach((file) => {
+			if (file.status === 'added' || file.status === 'modified') {
+				changed.push(file.filename);
+			}
+		});
+	}
+
 	// try {
 	// 	const q = `git diff --name-only ${head} ${base}`;
 	// 	const res = await sh(q);
@@ -61,7 +83,6 @@ async function main() {
 	const lcov = await parse(raw)
 	const baselcov = baseRaw && (await parse(baseRaw))
 	const body = await diff(lcov, baselcov, options)
-	const githubClient = new getOctokit(token)
 
 	const createGitHubComment = () =>
 		githubClient.rest.issues.createComment({
