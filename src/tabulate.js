@@ -12,14 +12,31 @@ export function tabulate(lcov, options) {
 	)
 
 	const folders = {}
+
+	function getFileParts(fileName) {
+		return fileName.replace(options.prefix, "").split("/");
+	}
+
+	function getFolderName(parts = []) {
+		return parts.slice(0, -1).join("/");
+	}
+	
+	options.files.forEach((fileName) => {
+		const parts = getFileParts(fileName);
+		const folder = getFolderName(parts);
+		folders[folder] = [];
+	});
+
 	for (const file of lcov) {
-		// if (!options.files.some(f => {
-		// 	return file.file.endsWith(f) || f.endsWith(file.file);
-		// })) {
-		// 	return;
-		// }
-		const parts = file.file.replace(options.prefix, "").split("/")
-		const folder = parts.slice(0, -1).join("/")
+		const shouldIncludeFile = options.files.length === 0 || options.files.includes(file.file)
+		const parts = getFileParts(file.file);
+		const folder = getFolderName(parts);
+		const hasFolder = folder in folders;
+
+		if (!shouldIncludeFile && !hasFolder) {
+			continue
+		}
+		
 		folders[folder] = folders[folder] || []
 		folders[folder].push(file)
 	}
@@ -31,7 +48,7 @@ export function tabulate(lcov, options) {
 				const files = folders[key].sort((a,b)=>a.file.localeCompare(b.file)).map(file => toRow(file, key !== "", options)).filter(e => e !== null);
 				return files.length ? [
 					...acc,
-					toFolder(key, options),
+					toFolder(key),
 					...files
 					,
 				] : [...acc];
@@ -67,9 +84,9 @@ function toFolder(path) {
 }
 
 function toRow(file, indent, options) {
-	let branches = percentage(file.branches, options);
-	let functions = percentage(file.functions, options);
-	let lines = percentage(file.lines, options);
+	let branches = percentage(file.branches);
+	let functions = percentage(file.functions);
+	let lines = percentage(file.lines);
 
 	const allOk = branches === '' && functions === '' && lines === '';
 
