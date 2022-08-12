@@ -13,6 +13,7 @@ async function main() {
 	const lcovFile = core.getInput("lcov-file") || "./coverage/lcov.info"
 	const baseFile = core.getInput("lcov-base")
 	const updateComment = core.getBooleanInput("update-comment")
+	const showChangedFiles = core.getBooleanInput("show-changed-files")
 
 	const raw = await fs.readFile(lcovFile, "utf-8").catch(err => null)
 	if (!raw) {
@@ -41,23 +42,26 @@ async function main() {
 	const githubClient = getOctokit(token);
 
 
-    // Use GitHub's compare two commits API.
-    // https://developer.github.com/v3/repos/commits/#compare-two-commits
+	if (showChangedFiles) {
+		// Use GitHub's compare two commits API.
+		// https://developer.github.com/v3/repos/commits/#compare-two-commits
 
-    const response = await githubClient.rest.repos.compareCommits({
-		base,
-		head,
-		owner: context.repo.owner,
-		repo: context.repo.repo
-	});
-
-	if (response.data.files.length > 0) {
-		response.data.files.forEach((file) => {
-			if (file.status === 'added' || file.status === 'modified') {
-				changed.push(file.filename);
-			}
+		const response = await githubClient.rest.repos.compareCommits({
+			base,
+			head,
+			owner: context.repo.owner,
+			repo: context.repo.repo
 		});
+
+		if (response.status === 200 && response.data.files.length > 0) {
+			response.data.files.forEach((file) => {
+				if (file.status === 'added' || file.status === 'modified') {
+					changed.push(file.filename);
+				}
+			});
+		}
 	}
+
 
 	const options = {
 		name,
