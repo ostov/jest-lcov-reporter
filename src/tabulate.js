@@ -98,7 +98,7 @@ function toRow(file, indent, options) {
 	let name = filename(file, indent, options);
 
 	if (lineCoverage > 0 && lineCoverage < options.minCoverage) {
-		name = `🔴 ${name} ⬆️ ${(options.minCoverage - lineCoverage).toFixed(2)}%`;
+		name = `🔴${indent?'':'&nbsp;'}${name}&nbsp;⬆️&nbsp;${(options.minCoverage - lineCoverage).toFixed(2)}%`;
 	}
 
 	return tr(
