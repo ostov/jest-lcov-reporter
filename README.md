@@ -32,6 +32,12 @@ If `true` the comment left on the PR will be updated (if one exists) with the ne
 instead of a new comment being created. If `false` every run will create a new comment on the PR
 with the new data and keep the previous comments. Defaults to `false`.
 
+##### `show-changed-files` (**Optional**)
+If `true` - update comment will contain a list of changed files with their coverage change.
+
+##### `min-coverage` (**Optional**)
+The minimum coverage percentage that is required for the action to pass. If the coverage is below - the action will fail.
+
 ## Example usage
 
 ```yml
