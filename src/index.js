@@ -16,7 +16,7 @@ async function main() {
 	const showChangedFiles = core.getBooleanInput("show-changed-files")
 	const rawMinCoverage = core.getInput("min-coverage");
 
-	const minCoverage = rawMinCoverage ? parseInt(rawMinCoverage, 10) : 0;
+	const minCoverage = rawMinCoverage ? parseFloat(rawMinCoverage) : 0;
 
 	const raw = await fs.readFile(lcovFile, "utf-8").catch(err => null)
 	if (!raw) {
