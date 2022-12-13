@@ -18,8 +18,6 @@ async function main() {
 
 	const minCoverage = rawMinCoverage ? parseFloat(rawMinCoverage) : 0;
 
-	console.info(`Min coverage: ${minCoverage}`);
-
 	const raw = await fs.readFile(lcovFile, "utf-8").catch(err => null)
 	if (!raw) {
 		console.log(`No coverage report found at '${lcovFile}', exiting...`)
@@ -87,11 +85,8 @@ async function main() {
 
 	if (minCoverage > 0) {
 		const coverage = percentage(lcov);
-		console.info(`Current coverage: ${coverage}%`);
 		if (coverage < minCoverage) {
 			error = new Error(`Coverage is below the minimum of ${minCoverage}%. Current coverage is ${coverage}%`);
-		} else {
-			console.info(`Coverage is above the minimum of ${minCoverage}%. Current coverage is ${coverage}%`);
 		}
 	}
 
@@ -126,6 +121,9 @@ async function main() {
 
 		if (existingComment) {
 			await updateGitHubComment(existingComment.id)
+			if (error) {
+				throw error;
+			}
 			return
 		}
 	}
