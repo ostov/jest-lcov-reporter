@@ -16,7 +16,7 @@ jobs:
 
       - uses: actions/setup-node@master
         with:
-          node-version: 16
+          node-version: 20
 
       - name: Unit test
         run: |
@@ -24,7 +24,7 @@ jobs:
             yarn install
             yarn test
 
-      - name : Scan Code 
+      - name : Scan Code
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
