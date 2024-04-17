@@ -42,7 +42,7 @@ The minimum coverage percentage that is required for the action to pass. If the 
 
 ```yml
 - name: Jest Lcov Reporter v2
-  uses: lifeart/jest-lcov-reporter@v0.3.2
+  uses: lifeart/jest-lcov-reporter@v0.4.0
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     lcov-file: ./coverage/lcov.info

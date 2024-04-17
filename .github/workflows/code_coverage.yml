@@ -12,11 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@master
 
       - uses: actions/setup-node@master
         with:
-          node-version: 16
+          node-version: 20
 
       - name: Unit test
         run: |
@@ -24,8 +24,8 @@ jobs:
             yarn install
             yarn test
 
-      - name : Scan Code 
-        uses: codecov/codecov-action@v1
+      - name : Scan Code
+        uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage/clover.xml # optional
